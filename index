@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công cụ Tổng hợp Tồn kho Online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f5f7f9;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+        .description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .upload-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px dashed #3498db;
+            border-radius: 6px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        .highlight {
+            background-color: #fff8e1;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn i {
+            margin-right: 6px;
+            font-size: 13px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-color: #2ecc71;
+        }
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+        .btn-tertiary {
+            background-color: #9b59b6;
+        }
+        .btn-tertiary:hover {
+            background-color: #8e44ad;
+        }
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+        .file-input {
+            margin: 0;
+            padding: 8px;
+            width: 100%;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .download-link {
+            display: inline-flex;
+            align-items: center;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 12px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            transition: all 0.2s;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .download-link:hover {
+            background-color: #e8f4fd;
+        }
+        .download-link i {
+            margin-right: 6px;
+        }
+        .filter-info {
+            padding: 6px 10px;
+            display: inline-block;
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .results-section {
+            margin-top: 20px;
+            overflow-x: auto;
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #ecf0f1;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .summary-item {
+            text-align: center;
+            padding: 12px;
+            background-color: #e7f4e4;
+            border-radius: 6px;
+        }
+        .summary-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #27ae60;
+            display: block;
+        }
+        .summary-label {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #fadbd8;
+            border-radius: 5px;
+            display: none;
+            font-size: 14px;
+        }
+        .success {
+            color: #27ae60;
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #e7f4e4;
+            border-radius: 5px;
+            display: none;
+            font-size: 14px;
+        }
+        .note {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 12px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        .action-buttons {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .collapsible {
+            background-color: #f1f8fe;
+            color: #2c3e50;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .collapsible:after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 14px;
+        }
+        .active:after {
+            content: '\f106';
+        }
+        .collapsible-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .file-upload-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 200px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+            .btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .summary {
+                grid-template-columns: 1fr 1fr;
+            }
+            .flex-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        @media (max-width: 480px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Công cụ Tổng hợp Tồn kho Online</h1>
+        <p class="description">Tổng hợp tồn kho từ "Kho Online 2" theo mã sản phẩm cha</p>
+        
+        <div class="upload-section">
+            <div class="highlight">
+                <div class="flex-row">
+                    <a href="https://nhanh.vn/product/item/inventory?storeId=121646&remain=2&remainByPr=0" target="_blank" class="download-link">
+                        <i class="fas fa-download"></i>Tải tồn kho
+                    </a>
+                    
+                    <div class="file-upload-container">
+                        <input type="file" id="fileUpload" accept=".csv, .xlsx, .xls" class="file-input">
+                    </div>
+                    
+                    <button class="btn" id="processBtn"><i class="fas fa-cog"></i>Xử lý dữ liệu</button>
+                    <button class="btn btn-secondary btn-small" id="resetBtn"><i class="fas fa-redo"></i>Làm mới</button>
+                </div>
+                
+                <div class="filter-info">
+                    <i class="fas fa-info-circle"></i> Đã tự động lọc bỏ các mã phụ kiện "CHI" và "HOPDUNGHANG"
+                </div>
+            </div>
+            
+            <p class="note">Hỗ trợ định dạng CSV, XLSX, XLS. File cần có các cột: Mã sản phẩm cha, Tên sản phẩm cha, Kho Online 2, Tổng tồn</p>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Đang xử lý dữ liệu...</p>
+            </div>
+        </div>
+        
+        <div id="errorMsg" class="error" style="display: none;"></div>
+        <div id="successMsg" class="success" style="display: none;"></div>
+        
+        <div id="results" class="results-section">
+            <button class="collapsible" id="toggleResults">Kết quả tổng hợp tồn kho</button>
+            <div class="collapsible-content" id="resultsContent">
+                <div class="summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Số mã sản phẩm</span>
+                        <span class="summary-value" id="totalParents">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Tổng tồn (Online)</span>
+                        <span class="summary-value" id="totalInventory">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Tổng tồn (Tất cả kho)</span>
+                        <span class="summary-value" id="totalAllInventory">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Mã đã lọc bỏ</span>
+                        <span class="summary-value" id="filteredCount">0</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-tertiary" id="copyBtn"><i class="fas fa-copy"></i>Sao chép dữ liệu</button>
+                </div>
+
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã sản phẩm cha</th>
+                            <th>Tên sản phẩm cha</th>
+                            <th>Tổng tồn (Online)</th>
+                            <th>Tổng tồn (Tất cả kho)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thư viện để đọc file Excel (xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        document.getElementById('processBtn').addEventListener('click', function() {
+            processFile();
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('fileUpload').value = '';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            copyTableToClipboard();
+        });
+
+        // Xử lý collapsible section
+        const coll = document.getElementById("toggleResults");
+        if (coll) {
+            coll.addEventListener("click", function() {
+                this.classList.toggle("active");
+                const content = document.getElementById("resultsContent");
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        }
+        
+        function processFile() {
+            const fileInput = document.getElementById('fileUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('Vui lòng chọn file để tải lên.');
+                return;
+            }
+            
+            const extension = file.name.split('.').pop().toLowerCase();
+            
+            // Hiển thị trạng thái loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+            
+            // Sử dụng setTimeout để giao diện kịp cập nhật trước khi xử lý dữ liệu
+            setTimeout(function() {
+                if (extension === 'csv') {
+                    processCSV(file);
+                } else if (extension === 'xlsx' || extension === 'xls') {
+                    processExcel(file);
+                } else {
+                    hideLoading();
+                    showError('Định dạng file không được hỗ trợ. Vui lòng chọn file CSV hoặc Excel.');
+                }
+            }, 100);
+        }
+        
+        function processCSV(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const content = e.target.result;
+                processData(content, 'csv');
+            };
+            
+            reader.onerror = function() {
+                hideLoading();
+                showError('Đã xảy ra lỗi khi đọc file.');
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+        }
+        
+        function processExcel(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    
+                    // Chuyển đổi dữ liệu Excel thành định dạng CSV để xử lý
+                    let csvContent = '';
+                    jsonData.forEach(row => {
+                        // Xử lý các giá trị có chứa dấu phẩy
+                        const processedRow = row.map(cell => {
+                            if (typeof cell === 'string' && cell.includes(',')) {
+                                return `"${cell}"`;
+                            }
+                            return cell;
+                        });
+                        csvContent += processedRow.join(',') + '\n';
+                    });
+                    
+                    processData(csvContent, 'csv');
+                } catch (error) {
+                    hideLoading();
+                    showError('Đã xảy ra lỗi khi xử lý file Excel: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                hideLoading();
+                showError('Đã xảy ra lỗi khi đọc file.');
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function processData(data, type) {
+            try {
+                // Phân tích dữ liệu CSV
+                const lines = parseCSV(data);
+                if (lines.length < 2) {
+                    hideLoading();
+                    showError('File không có dữ liệu hoặc định dạng không đúng.');
+                    return;
+                }
+                
+                // Xác định chỉ số cột
+                const headers = lines[0];
+                
+                const parentCodeIndex = headers.findIndex(header => header === "Mã sản phẩm cha");
+                const parentNameIndex = headers.findIndex(header => header === "Tên sản phẩm cha");
+                const onlineStockIndex = headers.findIndex(header => header === "Kho Online 2");
+                const totalStockIndex = headers.findIndex(header => header === "Tổng tồn");
+                
+                if (parentCodeIndex === -1 || parentNameIndex === -1 || onlineStockIndex === -1) {
+                    hideLoading();
+                    showError('File thiếu các cột cần thiết: Mã sản phẩm cha, Tên sản phẩm cha, hoặc Kho Online 2');
+                    return;
+                }
+                
+                // Gom nhóm và tính tổng
+                const inventoryMap = new Map();
+                let totalInventory = 0;
+                let totalAllInventory = 0;
+                let filteredCount = 0;
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const cells = lines[i];
+                    
+                    if (cells.length <= Math.max(parentCodeIndex, parentNameIndex, onlineStockIndex, totalStockIndex)) {
+                        continue; // Bỏ qua dòng không đủ dữ liệu
+                    }
+                    
+                    const parentCode = cells[parentCodeIndex] || '';
+                    const parentName = cells[parentNameIndex] || '';
+                    let onlineStockValue = parseFloat(cells[onlineStockIndex]) || 0;
+                    let totalStockValue = totalStockIndex !== -1 ? (parseFloat(cells[totalStockIndex]) || 0) : 0;
+                    
+                    // Bỏ qua các mã phụ kiện "CHI" và "HOPDUNGHANG"
+                    if (parentCode.includes("CHI") || parentCode.includes("HOPDUNGHANG")) {
+                        filteredCount++;
+                        continue;
+                    }
+                    
+                    if (parentCode) {
+                        if (inventoryMap.has(parentCode)) {
+                            const existing = inventoryMap.get(parentCode);
+                            existing.onlineStock += onlineStockValue;
+                            existing.totalStock += totalStockValue;
+                        } else {
+                            inventoryMap.set(parentCode, {
+                                name: parentName,
+                                onlineStock: onlineStockValue,
+                                totalStock: totalStockValue
+                            });
+                        }
+                        
+                        totalInventory += onlineStockValue;
+                        totalAllInventory += totalStockValue;
+                    }
+                }
+                
+                // Chuyển đổi Map thành mảng và sắp xếp
+                const sortedInventory = Array.from(inventoryMap.entries())
+                    .map(([code, data]) => ({ 
+                        code, 
+                        name: data.name, 
+                        onlineStock: data.onlineStock,
+                        totalStock: data.totalStock
+                    }))
+                    .sort((a, b) => b.onlineStock - a.onlineStock);
+                
+                // Hiển thị kết quả
+                displayResults(sortedInventory, totalInventory, totalAllInventory, filteredCount);
+                hideLoading();
+                
+            } catch (error) {
+                hideLoading();
+                showError('Đã xảy ra lỗi khi xử lý dữ liệu: ' + error.message);
+            }
+        }
+        
+        function parseCSV(data) {
+            const lines = [];
+            let currentLine = [];
+            let inQuotedField = false;
+            let currentValue = '';
+            
+            for (let i = 0; i < data.length; i++) {
+                const char = data[i];
+                
+                if (char === '"') {
+                    inQuotedField = !inQuotedField;
+                } else if (char === ',' && !inQuotedField) {
+                    currentLine.push(currentValue.trim());
+                    currentValue = '';
+                } else if (char === '\n' && !inQuotedField) {
+                    currentLine.push(currentValue.trim());
+                    lines.push(currentLine);
+                    currentLine = [];
+                    currentValue = '';
+                } else if (char === '\r') {
+                    // Bỏ qua ký tự carriage return
+                } else {
+                    currentValue += char;
+                }
+            }
+            
+            // Thêm dòng cuối cùng
+            if (currentValue.length > 0 || currentLine.length > 0) {
+                currentLine.push(currentValue.trim());
+                lines.push(currentLine);
+            }
+            
+            return lines;
+        }
+        
+        function displayResults(data, totalInventory, totalAllInventory, filteredCount) {
+            const resultsDiv = document.getElementById('results');
+            const tbody = document.querySelector('#resultTable tbody');
+            const totalParentsSpan = document.getElementById('totalParents');
+            const totalInventorySpan = document.getElementById('totalInventory');
+            const totalAllInventorySpan = document.getElementById('totalAllInventory');
+            const filteredCountSpan = document.getElementById('filteredCount');
+            
+            // Xóa dữ liệu cũ
+            tbody.innerHTML = '';
+            
+            // Thêm dữ liệu mới
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.onlineStock.toLocaleString('vi-VN')}</td>
+                    <td>${item.totalStock.toLocaleString('vi-VN')}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Cập nhật tổng số
+            totalParentsSpan.textContent = data.length.toLocaleString('vi-VN');
+            totalInventorySpan.textContent = totalInventory.toLocaleString('vi-VN');
+            totalAllInventorySpan.textContent = totalAllInventory.toLocaleString('vi-VN');
+            filteredCountSpan.textContent = filteredCount.toLocaleString('vi-VN');
+            
+            // Hiển thị kết quả
+            resultsDiv.style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+            
+            // Mở rộng phần kết quả
+            const collapsible = document.getElementById("toggleResults");
+            const content = document.getElementById("resultsContent");
+            collapsible.classList.add("active");
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+        
+        function copyTableToClipboard() {
+            try {
+                const table = document.getElementById('resultTable');
+                let csvContent = '';
+                
+                // Lấy tiêu đề
+                const headers = [];
+                for (let i = 0; i < table.rows[0].cells.length; i++) {
+                    headers.push(table.rows[0].cells[i].textContent);
+                }
+                csvContent += headers.join('\t') + '\n';
+                
+                // Lấy dữ liệu
+                for (let i = 1; i < table.rows.length; i++) {
+                    const row = table.rows[i];
+                    const rowData = [];
+                    
+                    for (let j = 0; j < row.cells.length; j++) {
+                        rowData.push(row.cells[j].textContent);
+                    }
+                    
+                    csvContent += rowData.join('\t') + '\n';
+                }
+                
+                // Sao chép vào clipboard
+                navigator.clipboard.writeText(csvContent).then(() => {
+                    showSuccess('Dữ liệu đã được sao chép vào clipboard! Bạn có thể dán vào Google Sheets.');
+                }).catch(err => {
+                    showError('Không thể sao chép dữ liệu: ' + err);
+                });
+            } catch (error) {
+                showError('Đã xảy ra lỗi khi sao chép dữ liệu: ' + error.message);
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMsg');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
